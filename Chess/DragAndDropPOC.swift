@@ -131,6 +131,7 @@ struct Example4View: View {
             HStack {
                 ForEach(sports, id: \.self) { sport in
                     Image(systemName: sport)
+//                    Text(verbatim: "\(sport)")
                         .frame(minWidth: 50, minHeight: 50)
                         .background(.red)
                         .foregroundStyle(.white)

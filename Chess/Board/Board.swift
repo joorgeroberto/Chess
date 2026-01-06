@@ -17,34 +17,45 @@ struct Board: View {
             let squareHeight = geometry.size.height
             let squareSize = min(squareWidth, squareHeight) / 8
 
+            // Preciso Guardar o Board pra poder fazer a movimentação
             VStack(spacing: 0) {
-                ForEach((1...ColumnPosition.allCases.count), id: \.self) { column in
+                ForEach((1...RowPosition.allCases.count), id: \.self) { row in
                     HStack(spacing: 0) {
-                        Text("\(column)")
+                        Text("\(row)")
                             .padding(.trailing, 10)
-                        ForEach(1...RowPosition.allCases.count, id: \.self) { row in
+                        ForEach(1...ColumnPosition.allCases.count, id: \.self) { column in
                             ZStack {
                                 Rectangle()
                                     .fill((row + column) % 2 == 0 ? Color.white : Color.gray)
                                     .frame(width: squareSize, height: squareSize)
-                                if let piece = viewModel.shouldRenderPiece(column, row - 1) {
-                                    Text(verbatim: "\(piece.type.rawValue)")
+                                if let piece = viewModel.getPieceAt(column, row), piece.type != .empty {
+                                    if piece.color == .white {
+                                        Text(verbatim: "W\(piece.type.rawValue)")
+                                    } else {
+                                        Text(verbatim: "B\(piece.type.rawValue)")
+                                    }
                                 }
+                                //                                if let selectedPiece = viewModel.selectedPiece {
+                                //                                    selectedPiece.possibleMoves
+                                //                                }
+                            }
+                            .onTapGesture {
+                                viewModel.onTapSquare(column, row)
                             }
                         }
                     }
                 }
 
-                rowsLabel(squareSize: squareSize)
+                columnsLabel(squareSize: squareSize)
             }
         }
     }
 
     @ViewBuilder
-    func rowsLabel(squareSize: CGFloat) -> some View {
+    func columnsLabel(squareSize: CGFloat) -> some View {
         HStack(spacing: 0) {
-            ForEach((1...RowPosition.allCases.count), id: \.self) { row in
-                Text(verbatim: "\(viewModel.getLetterFrom(number: row - 1))")
+            ForEach((1...ColumnPosition.allCases.count), id: \.self) { column in
+                Text(verbatim: "\(viewModel.getLetterFrom(number: column))")
                     .frame(maxWidth: .infinity)
             }
         }

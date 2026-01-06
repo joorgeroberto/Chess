@@ -10,24 +10,24 @@ import SwiftUI
 @Observable
 class BoardViewModel {
     var pieces: Set<Piece> = []
+    var selectedPiece: Piece?
 
     init() {
-        createPieces(withColor: .white)
-        createPieces(withColor: .black)
-    }
-    func getLetterFrom(number: Int) -> RowPosition {
-        return RowPosition.allCases[number]
+        createPieces()
     }
 
-    func createPieces(withColor color: PieceColor) {
+    func getLetterFrom(number: Int) -> ColumnPosition {
+        return ColumnPosition.allCases[number - 1]
+    }
+
+    func createPieces() {
         for columnIndex in 1...(ColumnPosition.allCases.count) {
             for rowIndex in 1...(RowPosition.allCases.count) {
-                let rowPosition = RowPosition.allCases[rowIndex - 1]
-                let columnPosition = ColumnPosition(rawValue: columnIndex)!
+                let rowPosition = RowPosition.allCases[columnIndex - 1]
+                let columnPosition = ColumnPosition.allCases[rowIndex - 1]
                 let piece = Piece(
                     rowPosition: rowPosition,
-                    columnPosition: columnPosition,
-                    color: color
+                    columnPosition: columnPosition
                 )
                 pieces.insert(piece)
             }
@@ -35,9 +35,16 @@ class BoardViewModel {
 
     }
 
-    func shouldRenderPiece(_ column: Int, _ row: Int) -> Piece? {
+    func getPieceAt(_ column: Int, _ row: Int) -> Piece? {
         return pieces.first(where: {
-            $0.columnPosition.rawValue == column &&
-            $0.rowPosition.rawValue == getLetterFrom(number: row).rawValue})
+            $0.boardPosition.row.rawValue == row &&
+            $0.boardPosition.column.rawValue == getLetterFrom(number: column).rawValue
+        })
+    }
+
+    func onTapSquare(_ column: Int, _ row: Int) {
+        if let piece = getPieceAt(column, row) {
+            selectedPiece = piece
+        }
     }
 }
